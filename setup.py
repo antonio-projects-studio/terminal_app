@@ -1,11 +1,11 @@
-import setuptools
+from setuptools import setup, find_packages
 
 
 with open("README.md", "r", encoding="utf-8") as f:
     more_description = f.read()
 
 
-setuptools.setup(
+setup(
     name="terminal_app",
     version="0.0.1",
     author="Antonio Rodrigues",
@@ -14,6 +14,6 @@ setuptools.setup(
     long_description=more_description,
     long_description_content_type="text/markdown",
     url="https://github.com/antonio-projects-studio/terminal_app",
-    packages=["terminal_app"],
+    packages=find_packages(),
     install_requires=["langchain-core", "langchain-text-splitters"],
 )
