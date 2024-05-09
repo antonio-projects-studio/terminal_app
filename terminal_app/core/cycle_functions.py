@@ -41,6 +41,19 @@ def question_input(message: str) -> bool | None:
         return True if prompt == "y" else False
 
 
+def number_input(message: str, list: list[Any] | None = None) -> Any:
+    prompt = app_input(message)
+    try:
+        prompt = int(prompt)
+        if list is None:
+            return prompt
+        else:
+            return list[prompt]
+    except Exception as ex:
+        print(ex)
+        return None
+
+
 def cycle_decorator(
     message: Callable[..., str], pass_in_message: bool = False, **upper_kwargs
 ):
