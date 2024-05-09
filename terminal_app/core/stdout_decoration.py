@@ -70,7 +70,7 @@ class AttentionPrint:
 
     @staticmethod
     def pretty_dict(data: Any):
-        print(json.dumps(data, sort_keys=False, indent=4))
+        print(json.dumps(data, sort_keys=False, ensure_ascii=False, indent=4))
         
 
     @staticmethod

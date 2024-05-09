@@ -29,29 +29,39 @@ def app_input(message: str) -> str:
         prompt = QuitOrReturnOptions.RETURN.command
         QuitOrReturnOptions.RETURN.execute(prompt)
         return ""
+    
     QuitOrReturnOptions.QUIT.execute(prompt)
     return prompt
 
 
-def question_input(message: str) -> bool | None:
+def question_input(message: str) -> bool | str:
     prompt = app_input(message)
-    if not prompt or prompt not in ["y", "n"]:
-        return None
-    else:
-        return True if prompt == "y" else False
+    if not prompt:
+        return ""
+
+    if prompt not in ["y", "n"]:
+        print("Incorrect input")
+        return question_input(message)
+
+    return True if prompt == "y" else False
 
 
 def number_input(message: str, list: list[Any] | None = None) -> Any:
     prompt = app_input(message)
+    if not prompt:
+        return ""
+
     try:
         prompt = int(prompt)
         if list is None:
             return prompt
         else:
             return list[prompt]
+
     except Exception as ex:
+        print("Incorrect input")
         print(ex)
-        return None
+        return number_input(message, list)
 
 
 def cycle_decorator(
