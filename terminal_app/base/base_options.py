@@ -1,10 +1,12 @@
 from enum import Enum
 from typing import Any, Callable
-import sys
 
 
 class BaseOptions(Enum):
-    def __init__(self, command: str, func: Callable[..., bool | list[str]] | None = None) -> None:
+    def __init__(self, command: str, func: Callable[..., Any] | None = None) -> None:
+        assert (
+            func.__annotations__["return"] is not None
+        ), "Function should not return None"
         self.command = command
         self.func = func
 

@@ -36,7 +36,11 @@ def app_input(message: str) -> str:
 def cycle_decorator(
     message: Callable[..., str], pass_in_message: bool = False, **upper_kwargs
 ):
-    def decorator(func: Callable[..., bool]) -> Callable[..., bool]:
+    def decorator(func: Callable[..., Any]) -> Callable[..., bool]:
+        assert (
+            func.__annotations__["return"] is not None
+        ), "Function should not return None"
+
         @wraps(func)
         def wrapper(**kwargs) -> bool:
             data = deepcopy(upper_kwargs)
