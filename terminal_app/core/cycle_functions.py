@@ -33,6 +33,14 @@ def app_input(message: str) -> str:
     return prompt
 
 
+def question_input(message: str) -> bool | None:
+    prompt = app_input(message)
+    if not prompt or prompt not in ["y", "n"]:
+        return None
+    else:
+        return True if prompt == "y" else False
+
+
 def cycle_decorator(
     message: Callable[..., str], pass_in_message: bool = False, **upper_kwargs
 ):
