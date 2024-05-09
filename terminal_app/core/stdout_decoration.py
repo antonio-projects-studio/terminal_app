@@ -68,7 +68,8 @@ class AttentionPrint:
 
         return self
 
-    def pp(self, data: Any):
+    @staticmethod
+    def pprint(data: Any):
         pprint(data)
 
     @staticmethod
@@ -104,7 +105,7 @@ class AttentionPrint:
                     print("\nMETADATA\n")
                     for agent, data in metadata.items():
                         print(f"{agent.upper()} ")
-                        pprint(data)
+                        AttentionPrint.pprint(data)
                         print("\n")
 
                 sys.stdout = ORIG_STDOUT
@@ -189,11 +190,11 @@ class AttentionPrint:
 
                     print(f"{name} = ", end="")
                     if pretty_list:
-                        log.pp(data)
+                        log.pprint(data)
 
                     else:
                         if isinstance(data, dict):
-                            log.pp(data)
+                            log.pprint(data)
                         else:
                             print(data)
 
