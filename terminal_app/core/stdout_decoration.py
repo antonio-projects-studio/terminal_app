@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 from pprint import pprint
 import sys
 from textwrap import dedent
-
+import json
 ORIG_STDOUT = sys.stdout
 
 class AttentionPrint:
@@ -67,6 +67,11 @@ class AttentionPrint:
         print(self.notice(name, self.cnt))
 
         return self
+
+    @staticmethod
+    def pretty_dict(data: Any):
+        print(json.dumps(data, sort_keys=False, indent=4))
+        
 
     @staticmethod
     def pprint(data: Any):
