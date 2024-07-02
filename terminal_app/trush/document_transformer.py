@@ -4,7 +4,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pypdf import PdfReader
 
 from terminal_app.base import BaseOptions
-from .cycle_functions import app_input
+from ..core.cycle_functions import app_input
 
 
 def read_file(file_path: Path) -> str:

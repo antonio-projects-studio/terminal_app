@@ -1,10 +1,5 @@
 from __future__ import annotations
-from typing import Any, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from generative_agent import ChatInfo
-    from gigachat.models import Messages, MessagesRole
-
+from typing import Any
 from pprint import pprint
 import sys
 from textwrap import dedent
