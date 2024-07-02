@@ -8,7 +8,7 @@ if __name__ == "__main__":
     print("Test 1...")
     import root
     
-    assert (Path(__file__).parent / "root.root.log").exists()
+    assert (Path(__file__).parent / "loggers/root.root.log").exists()
     assert (Path(__file__).parent / "root/root.log").exists()
     assert (Path(__file__).parent / "root/child/child.log").exists()
     

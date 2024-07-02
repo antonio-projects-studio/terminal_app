@@ -1,6 +1,7 @@
 __all__ = ["register_logger", "LoggingMeta", "BaseLogging"]
 
 import __main__
+import os
 import logging
 from typing import Any
 from logging import Logger
@@ -26,6 +27,8 @@ def register_logger(path: Path | str, name: str | None = None) -> Logger:
 
 
 class LoggingMeta(type):
+    __folder_name__: str = "loggers"
+    __root_path__: Path = Path(__main__.__file__).parent / __folder_name__
     logger: Logger
     root_logger: Logger
 
@@ -35,7 +38,16 @@ class LoggingMeta(type):
         cls = super().__new__(mcls, name, bases, namespace)
 
         if "BaseLogging" in [base.__name__ for base in bases]:
-            cls.root_logger = register_logger(f"{name.lower()}.root.log")
+
+            create_folder = False
+            create_folder = not cls.__root_path__.exists()
+            create_folder = not cls.__root_path__.is_dir()
+            if create_folder:
+                os.mkdir(cls.__root_path__)
+
+            cls.root_logger = register_logger(
+                cls.__root_path__ / f"{name.lower()}.root.log"
+            )
 
         if namespace.get("LOGGING", None) is True:
             file = Path(getfile(cls))
