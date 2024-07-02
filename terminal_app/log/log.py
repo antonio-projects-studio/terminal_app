@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 __all__ = ["register_logger", "LoggingMeta", "BaseLogging"]
 
 import __main__
@@ -8,6 +9,8 @@ from typing import Any
 from logging import Logger
 from pathlib import Path
 from inspect import getfile
+
+suffix = "terminal_app.Engine"
 
 
 def register_logger(
@@ -35,8 +38,13 @@ def register_logger(
         for handler in logger.handlers:
             logger.removeHandler(handler)
     else:
-        assert f"{name}.Engine" not in logging.Logger.manager.loggerDict.keys(), "The same name of the loggers"
-        logger = logging.getLogger(f"{name}.Engine")
+        if name is not None:
+            assert (
+                f"{name}.{suffix}" not in logging.Logger.manager.loggerDict.keys()
+            ), "The same name of the loggers"
+            logger = logging.getLogger(f"{name}.{suffix}")
+        else:
+            logger = logging.getLogger(suffix)
 
     if path is not None:
         logger.addHandler(file_handler)
