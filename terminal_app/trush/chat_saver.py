@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 import os
 from pathlib import Path
 
-from .stdout_decoration import AttentionPrint
+from ..core.stdout_decoration import AttentionPrint
 
 
 class ChatSaver:
