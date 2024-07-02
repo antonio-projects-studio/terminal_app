@@ -16,6 +16,7 @@ suffix = "terminal_app.Engine"
 def register_logger(
     path: Path | str | None = None,
     name: str | None = None,
+    library: bool = False,
     level: logging._Level = logging.DEBUG,
 ) -> Logger:
 
@@ -32,7 +33,7 @@ def register_logger(
 
     name = name if name is not None else file_path.stem if path is not None else None
 
-    if name in logging.Logger.manager.loggerDict.keys():
+    if name in logging.Logger.manager.loggerDict.keys() or library:
         print(f"Change {name} logger")
         logger = logging.getLogger(name)
         for handler in logger.handlers:
