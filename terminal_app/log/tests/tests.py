@@ -3,12 +3,17 @@ import sys
 
 sys.path.append(Path(__file__).parent.parent.as_posix())
 
+from log import register_logger
+
+logger = register_logger()
 
 if __name__ == "__main__":
     print("Test 1...")
     import root
     
-    assert (Path(__file__).parent / "loggers/root.root.log").exists()
+    logger.info("Logger")
+    
+    assert (Path(__file__).parent / "loggers/root_root.log").exists()
     assert (Path(__file__).parent / "root/root.log").exists()
     assert (Path(__file__).parent / "root/child/child.log").exists()
     

@@ -1,3 +1,4 @@
+from __future__ import annotations
 __all__ = ["register_logger", "LoggingMeta", "BaseLogging"]
 
 import __main__
@@ -9,19 +10,41 @@ from pathlib import Path
 from inspect import getfile
 
 
-def register_logger(path: Path | str, name: str | None = None) -> Logger:
+def register_logger(
+    path: Path | str | None = None,
+    name: str | None = None,
+    level: logging._Level = logging.DEBUG,
+) -> Logger:
 
     formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
 
-    file_path = Path(__main__.__file__).parent / path if isinstance(path, str) else path
-    file_handler = logging.FileHandler(file_path.as_posix(), mode="w")
-    file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(formatter)
+    if path is not None:
 
-    name = name if name is not None else file_path.stem
-    logger = logging.getLogger(f"{name}.Engine")
-    logger.addHandler(file_handler)
-    logger.setLevel(logging.DEBUG)
+        file_path = (
+            Path(__main__.__file__).parent / path if isinstance(path, str) else path
+        )
+        file_handler = logging.FileHandler(file_path.as_posix(), mode="w")
+        file_handler.setLevel(logging.DEBUG)
+        file_handler.setFormatter(formatter)
+
+    name = name if name is not None else file_path.stem if path is not None else None
+
+    if name in logging.Logger.manager.loggerDict.keys():
+        print(f"Change {name} logger")
+        logger = logging.getLogger(name)
+        for handler in logger.handlers:
+            logger.removeHandler(handler)
+    else:
+        assert f"{name}.Engine" not in logging.Logger.manager.loggerDict.keys(), "The same name of the loggers"
+        logger = logging.getLogger(f"{name}.Engine")
+
+    if path is not None:
+        logger.addHandler(file_handler)
+    else:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(formatter)
+        logger.addHandler(stream_handler)
+    logger.setLevel(level)
 
     return logger
 
@@ -46,7 +69,7 @@ class LoggingMeta(type):
                 os.mkdir(cls.__root_path__)
 
             cls.root_logger = register_logger(
-                cls.__root_path__ / f"{name.lower()}.root.log"
+                cls.__root_path__ / f"{name.lower()}_root.log"
             )
 
         if namespace.get("LOGGING", None) is True:
