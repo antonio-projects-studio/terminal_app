@@ -1,9 +1,9 @@
 from pathlib import Path
 import sys
 
-sys.path.append(Path(__file__).parent.parent.as_posix())
+sys.path.append(Path(__file__).parent.parent.parent.parent.as_posix())
 
-from log import register_logger
+from terminal_app.logging import register_logger
 
 logger = register_logger()
 

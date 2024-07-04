@@ -1,7 +1,10 @@
-from log import BaseLogging
+from terminal_app.logging import RootLogging
+import os
+
+os.environ["ROOT_LOGGING"] = "1"
 
 
-class Root(BaseLogging):
+class Root(RootLogging):
     LOGGING = True
     
     def __init__(self) -> None:

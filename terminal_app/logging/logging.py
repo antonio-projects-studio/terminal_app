@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-__all__ = ["register_logger", "LoggingMeta", "BaseLogging"]
+__all__ = ["register_logger", "LoggingMeta", "RootLogging"]
 
 import __main__
 import os
@@ -69,17 +69,18 @@ class LoggingMeta(type):
     ) -> type:
         cls = super().__new__(mcls, name, bases, namespace)
 
-        if "BaseLogging" in [base.__name__ for base in bases]:
+        if "RootLogging" in [base.__name__ for base in bases]:
+            if os.getenv(f"{name.upper()}_LOGGING"):
 
-            create_folder = False
-            create_folder = not cls.__root_path__.exists()
-            create_folder = not cls.__root_path__.is_dir()
-            if create_folder:
-                os.mkdir(cls.__root_path__)
+                create_folder = False
+                create_folder = not cls.__root_path__.exists()
+                create_folder = not cls.__root_path__.is_dir()
+                if create_folder:
+                    os.mkdir(cls.__root_path__)
 
-            cls.root_logger = register_logger(
-                cls.__root_path__ / f"{name.lower()}_root.log"
-            )
+                cls.root_logger = register_logger(
+                    cls.__root_path__ / f"{name.lower()}_root.log"
+                )
 
         if namespace.get("LOGGING", None) is True:
             file = Path(getfile(cls))
@@ -88,5 +89,5 @@ class LoggingMeta(type):
         return cls
 
 
-class BaseLogging(metaclass=LoggingMeta):
+class RootLogging(metaclass=LoggingMeta):
     LOGGING = False
