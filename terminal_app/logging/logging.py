@@ -70,7 +70,7 @@ class LoggingMeta(type):
         cls = super().__new__(mcls, name, bases, namespace)
 
         if "RootLogging" in [base.__name__ for base in bases]:
-            if os.getenv(f"{name.upper()}_LOGGING"):
+            if os.getenv(f"{name}_LOGGING"):
 
                 create_folder = False
                 create_folder = not cls.__root_path__.exists()
@@ -79,7 +79,7 @@ class LoggingMeta(type):
                     os.mkdir(cls.__root_path__)
 
                 cls.root_logger = register_logger(
-                    cls.__root_path__ / f"{name.lower()}_root.log"
+                    cls.__root_path__ / f"{name}.log"
                 )
 
         if namespace.get("LOGGING", None) is True:
