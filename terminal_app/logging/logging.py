@@ -12,6 +12,13 @@ from inspect import getfile
 
 suffix = "terminal_app.Engine"
 
+def generated_name(name: str, x=0) -> str:
+    dir_name = (name + ("_" + str(x) if x != 0 else "")).strip()
+    if not os.path.exists(dir_name):
+        os.mkdir(dir_name)
+        return dir_name
+    else:
+        return generated_name(name, x + 1)
 
 def register_logger(
     path: Path | str | None = None,
