@@ -25,13 +25,23 @@ if not DEV_OS_DIR.exists():
 
 
 def source(env_files: str | list[str]) -> None:
+
+    def _source(env_files: str) -> None:
+        file_path = DEV_OS_DIR / env_files
+        if not file_path.exists():
+            with open(file_path, "w"):
+                pass
+            print(f"Create {file_path}")
+        else:
+            load_dotenv(DEV_OS_DIR / env_files)
+
     if MODE == "development":
         if isinstance(env_files, str):
-            load_dotenv(DEV_OS_DIR / env_files)
+            _source(env_files)
 
         else:
             for path in env_files:
-                load_dotenv(DEV_OS_DIR / path)
+                _source(path)
 
 
 RUN_MODE = sys.argv[-1]
