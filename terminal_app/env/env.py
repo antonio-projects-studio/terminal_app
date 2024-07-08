@@ -10,7 +10,7 @@ OS = platform.system().lower()
 
 BASE_DIR = Path(__main__.__file__).parent.parent
 CONFIG_DIR = BASE_DIR / "configs"
-DEV_OS_DIR = CONFIG_DIR / "development_{OS}"
+DEV_OS_DIR = CONFIG_DIR / f"development_{OS}"
 
 PYTHON_DIR = Path(__main__.__file__).parent
 
