@@ -85,7 +85,7 @@ class LoggingMeta(type):
 
         if namespace.get("LOGGING", None) is True:
             file = Path(getfile(cls))
-            cls.logger = register_logger(file.parent / (file.stem + ".log"))
+            cls.logger = register_logger(file.parent / (file.stem + ".log"), name=name)
 
         return cls
 
