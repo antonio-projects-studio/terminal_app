@@ -11,14 +11,7 @@ from pathlib import Path
 from inspect import getfile
 
 suffix = "terminal_app.Engine"
-
-def generated_name(name: str, x=0) -> str:
-    dir_name = (name + ("_" + str(x) if x != 0 else "")).strip()
-    if not os.path.exists(dir_name):
-        os.mkdir(dir_name)
-        return dir_name
-    else:
-        return generated_name(name, x + 1)
+ 
 
 def register_logger(
     path: Path | str | None = None,
@@ -34,9 +27,6 @@ def register_logger(
         file_path = (
             Path(__main__.__file__).parent / path if isinstance(path, str) else path
         )
-        file_handler = logging.FileHandler(file_path.as_posix(), mode="w")
-        file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(formatter)
 
     name = name if name is not None else file_path.stem if path is not None else None
 
@@ -55,11 +45,15 @@ def register_logger(
             logger = logging.getLogger(suffix)
 
     if path is not None:
+        file_handler = logging.FileHandler(file_path.as_posix(), mode="w")
+        file_handler.setLevel(logging.DEBUG)
+        file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
     else:
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(formatter)
         logger.addHandler(stream_handler)
+        
     logger.setLevel(level)
 
     return logger
