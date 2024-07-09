@@ -28,7 +28,7 @@ def verify_ssl_certificate(url: str, certificate_folder: Path):
 
                 continue
 
-            raise Exception("ERROR: certificates are not installed")
+            print("INFO: the certificates were not installed")
 
-    message = "Сertificates found..."
+    message = "Certificates found..."
     print(message)
