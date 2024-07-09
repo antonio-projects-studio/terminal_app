@@ -1,12 +1,13 @@
 import certifi
 import requests
 
-from pathlib import Path
+from .env import CONFIG_DIR
 
 
-def verify_ssl_certificate(url: str, certificate_folder: Path):
-    assert certificate_folder.exists(), "The folder must exist"
-    assert certificate_folder.is_dir(), "The certificates folder should be a directory"
+def verify_ssl_certificate(url: str, certificate_folder: str):
+    certificate_path = CONFIG_DIR / certificate_folder
+    assert certificate_path.exists(), "The folder must exist"
+    assert certificate_path.is_dir(), "The certificates folder should be a directory"
 
     for attempt in range(2):
         message: str
@@ -17,7 +18,7 @@ def verify_ssl_certificate(url: str, certificate_folder: Path):
 
                 cert_file = certifi.where()
 
-                for file in certificate_folder.iterdir():
+                for file in certificate_path.iterdir():
                     if file.is_file():
                         if file.suffix == ".pem":
                             with open(file, "rb") as infile:
