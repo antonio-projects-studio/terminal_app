@@ -9,7 +9,9 @@ from dotenv import load_dotenv
 OS = platform.system().lower()
 
 BASE_DIR = Path(__main__.__file__).parent.parent
+
 CONFIG_DIR = BASE_DIR / "configs"
+DATA_DIR = BASE_DIR / "data"
 DEV_DIR = CONFIG_DIR / f"development"
 PROD_DIR = CONFIG_DIR / f"production"
 
@@ -18,11 +20,10 @@ PYTHON_DIR = Path(__main__.__file__).parent
 MODE = os.getenv("PROD") or "development"
 CURRENT_DIR = DEV_DIR if MODE == "development" else PROD_DIR
 
-if not CONFIG_DIR.exists():
-    os.mkdir(CONFIG_DIR)
 
-if not DEV_DIR.exists():
-    os.mkdir(DEV_DIR)
+for path in [CONFIG_DIR, DATA_DIR, DEV_DIR, PROD_DIR]:
+    if not path.exists():
+        os.mkdir(path)
 
 
 def source(env_files: str | list[str]) -> dict[str, str]:
