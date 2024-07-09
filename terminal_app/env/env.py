@@ -1,10 +1,10 @@
+import __main__
 import os
 import sys
+import platform
 
 from pathlib import Path
 from dotenv import load_dotenv
-import platform
-import __main__
 
 OS = platform.system().lower()
 
@@ -13,7 +13,6 @@ CONFIG_DIR = BASE_DIR / "configs"
 DEV_OS_DIR = CONFIG_DIR / f"development_{OS}"
 
 PYTHON_DIR = Path(__main__.__file__).parent
-
 
 MODE = os.getenv("MODE") or "development"
 
