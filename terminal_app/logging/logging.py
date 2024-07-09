@@ -25,7 +25,7 @@ def register_logger(
     if path is not None:
 
         file_path = (
-            Path(__main__.__file__).parent / path if isinstance(path, str) else path
+            Path(__main__.__file__).parent.parent / path if isinstance(path, str) else path
         )
 
     name = name if name is not None else file_path.stem if path is not None else None
@@ -61,7 +61,7 @@ def register_logger(
 
 class LoggingMeta(type):
     __folder_name__: str = "loggers"
-    __root_path__: Path = Path(__main__.__file__).parent / __folder_name__
+    __root_path__: Path = Path(__main__.__file__).parent.parent / __folder_name__
     logger: Logger
     root_logger: Logger
 
