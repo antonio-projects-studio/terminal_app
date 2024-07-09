@@ -3,6 +3,7 @@ import os
 import sys
 import platform
 
+from typing import Any
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -23,7 +24,8 @@ if not DEV_OS_DIR.exists():
     os.mkdir(DEV_OS_DIR)
 
 
-def source(env_files: str | list[str]) -> None:
+def source(env_files: str | list[str]) -> dict[str, str]:
+    data: dict[str, str] = {}
 
     def _source(env_files: str) -> None:
         file_path = DEV_OS_DIR / env_files
@@ -34,13 +36,27 @@ def source(env_files: str | list[str]) -> None:
         else:
             load_dotenv(DEV_OS_DIR / env_files)
 
+    def load_variables(env_files: str) -> None:
+        file_path = DEV_OS_DIR / env_files
+        with open(file_path) as f:
+            for line in f.readlines():
+                line = line.strip()
+                if not line.startswith("#"):
+                    name = line[: line.find("=")].strip()
+                    arg = line[line.find("=") + 1 :].strip()
+                    data[name] = arg
+
     if MODE == "development":
         if isinstance(env_files, str):
             _source(env_files)
+            load_variables(env_files)
 
         else:
             for path in env_files:
                 _source(path)
+                load_variables(path)
+
+    return data
 
 
 RUN_MODE = sys.argv[-1]
