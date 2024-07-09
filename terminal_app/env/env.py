@@ -25,6 +25,7 @@ if not DEV_OS_DIR.exists():
 
 
 def source(env_files: str | list[str]) -> dict[str, str]:
+    #TODO ignore " in .env
     data: dict[str, str] = {}
 
     def _source(env_files: str) -> None:
