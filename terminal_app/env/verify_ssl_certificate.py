@@ -3,11 +3,12 @@ import requests
 
 from .env import CONFIG_DIR
 
+CERTIFICATES_DIR = CONFIG_DIR / "certificates"
 
-def verify_ssl_certificate(url: str, certificate_folder: str):
-    certificate_path = CONFIG_DIR / certificate_folder
-    assert certificate_path.exists(), "The folder must exist"
-    assert certificate_path.is_dir(), "The certificates folder should be a directory"
+
+def verify_ssl_certificate(url: str):
+    assert CERTIFICATES_DIR.exists(), "The folder must exist"
+    assert CERTIFICATES_DIR.is_dir(), "The certificates folder should be a directory"
 
     for attempt in range(2):
         message: str
@@ -18,7 +19,7 @@ def verify_ssl_certificate(url: str, certificate_folder: str):
 
                 cert_file = certifi.where()
 
-                for file in certificate_path.iterdir():
+                for file in CERTIFICATES_DIR.iterdir():
                     if file.is_file():
                         if file.suffix == ".pem":
                             with open(file, "rb") as infile:
