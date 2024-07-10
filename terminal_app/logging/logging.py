@@ -24,7 +24,7 @@ def register_logger(
 
     if path is not None:
 
-        file_path = LoggingMeta.__root_path__ / path if isinstance(path, str) else path
+        file_path = RootLogging.root_path / path if isinstance(path, str) else path
 
     name = name if name is not None else file_path.stem if path is not None else None
 
@@ -63,6 +63,16 @@ class LoggingMeta(type):
     logger: Logger
     root_logger: Logger
 
+    @property
+    def root_path(cls) -> Path:
+        create_folder = False
+        create_folder = not LoggingMeta.__root_path__.exists()
+        create_folder = not LoggingMeta.__root_path__.is_dir()
+        if create_folder:
+            os.mkdir(LoggingMeta.__root_path__)
+
+        return LoggingMeta.__root_path__
+
     def __new__(
         mcls, name: str, bases: tuple[type, ...], namespace: dict[str, Any]
     ) -> type:
@@ -71,13 +81,7 @@ class LoggingMeta(type):
         if "RootLogging" in [base.__name__ for base in bases]:
             if os.getenv(f"{name}_LOGGING"):
 
-                create_folder = False
-                create_folder = not cls.__root_path__.exists()
-                create_folder = not cls.__root_path__.is_dir()
-                if create_folder:
-                    os.mkdir(cls.__root_path__)
-
-                cls.root_logger = register_logger(cls.__root_path__ / f"{name}.log")
+                cls.root_logger = register_logger(cls.root_path / f"{name}.log")
 
         if namespace.get("LOGGING", None) is True:
             file = Path(getfile(cls))
