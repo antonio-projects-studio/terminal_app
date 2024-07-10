@@ -11,7 +11,7 @@ from pathlib import Path
 from inspect import getfile
 
 suffix = "terminal_app.Engine"
- 
+
 
 def register_logger(
     path: Path | str | None = None,
@@ -24,9 +24,7 @@ def register_logger(
 
     if path is not None:
 
-        file_path = (
-            Path(__main__.__file__).parent.parent / path if isinstance(path, str) else path
-        )
+        file_path = LoggingMeta.__root_path__ / path if isinstance(path, str) else path
 
     name = name if name is not None else file_path.stem if path is not None else None
 
@@ -53,14 +51,14 @@ def register_logger(
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(formatter)
         logger.addHandler(stream_handler)
-        
+
     logger.setLevel(level)
 
     return logger
 
 
 class LoggingMeta(type):
-    __folder_name__: str = "loggers"
+    __folder_name__: str = "logging"
     __root_path__: Path = Path(__main__.__file__).parent.parent / __folder_name__
     logger: Logger
     root_logger: Logger
@@ -79,9 +77,7 @@ class LoggingMeta(type):
                 if create_folder:
                     os.mkdir(cls.__root_path__)
 
-                cls.root_logger = register_logger(
-                    cls.__root_path__ / f"{name}.log"
-                )
+                cls.root_logger = register_logger(cls.__root_path__ / f"{name}.log")
 
         if namespace.get("LOGGING", None) is True:
             file = Path(getfile(cls))
