@@ -7,14 +7,16 @@ CERTIFICATES_DIR = CONFIG_DIR / "certificates"
 
 
 def verify_ssl_certificate(url: str):
-    assert CERTIFICATES_DIR.exists(), "The folder must exist"
-    assert CERTIFICATES_DIR.is_dir(), "The certificates folder should be a directory"
 
     for attempt in range(2):
         message: str
         try:
             requests.get(url=url, verify=True)
         except requests.exceptions.SSLError as ex:
+            assert CERTIFICATES_DIR.exists(), "The folder must exist"
+            assert (
+                CERTIFICATES_DIR.is_dir()
+            ), "The certificates folder should be a directory"
             if attempt == 0:
 
                 cert_file = certifi.where()
