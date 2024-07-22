@@ -31,6 +31,7 @@ def source(env_files: str | list[str]) -> dict[str, str]:
     data: dict[str, str] = {}
 
     def _source(env_files: str) -> None:
+        assert env_files.endswith(".env"), "The configuration file must end in .env"
         file_path = CURRENT_DIR / env_files
         if not file_path.exists():
             with open(file_path, "w"):
