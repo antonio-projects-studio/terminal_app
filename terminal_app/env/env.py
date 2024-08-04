@@ -1,4 +1,19 @@
-import __main__
+__all__ = [
+    "OS",
+    "BASE_DIR",
+    "WORK_DIR",
+    "CONFIG_BASE_DIR",
+    "DATA_DIR",
+    "DEV_DIR",
+    "PROD_DIR",
+    "APP_MODE",
+    "RUN_MODE",
+    "CONFIG_DIR",
+    "source",
+]
+
+
+# import __main__
 import os
 import sys
 import platform
@@ -7,21 +22,21 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 OS = platform.system().lower()
+BASE_DIR = Path(os.getcwd()).parent
+WORK_DIR = Path(os.getcwd())
 
-BASE_DIR = Path(__main__.__file__).parent.parent
-
-CONFIG_DIR = BASE_DIR / "configs"
+CONFIG_BASE_DIR = BASE_DIR / "configs"
 DATA_DIR = BASE_DIR / "data"
-DEV_DIR = CONFIG_DIR / f"development"
-PROD_DIR = CONFIG_DIR / f"production"
+DEV_DIR = CONFIG_BASE_DIR / f"development"
+PROD_DIR = CONFIG_BASE_DIR / f"production"
 
-PYTHON_DIR = Path(__main__.__file__).parent
+APP_MODE = os.getenv("PROD") or "development"
+RUN_MODE = sys.argv[-1]
 
-MODE = os.getenv("PROD") or "development"
-CURRENT_DIR = DEV_DIR if MODE == "development" else PROD_DIR
+CONFIG_DIR = DEV_DIR if APP_MODE == "development" else PROD_DIR
 
 
-for path in [CONFIG_DIR, DATA_DIR, DEV_DIR, PROD_DIR]:
+for path in [CONFIG_BASE_DIR, DATA_DIR, DEV_DIR, PROD_DIR]:
     if not path.exists():
         os.mkdir(path)
 
@@ -32,16 +47,16 @@ def source(env_files: str | list[str]) -> dict[str, str]:
 
     def _source(env_files: str) -> None:
         assert env_files.endswith(".env"), "The configuration file must end in .env"
-        file_path = CURRENT_DIR / env_files
+        file_path = CONFIG_DIR / env_files
         if not file_path.exists():
             with open(file_path, "w"):
                 pass
             print(f"Create {file_path}")
         else:
-            load_dotenv(CURRENT_DIR / env_files)
+            load_dotenv(CONFIG_DIR / env_files)
 
     def load_variables(env_files: str) -> None:
-        file_path = CURRENT_DIR / env_files
+        file_path = CONFIG_DIR / env_files
         with open(file_path) as f:
             for line in f.readlines():
                 line = line.strip()
@@ -60,6 +75,3 @@ def source(env_files: str | list[str]) -> dict[str, str]:
             load_variables(path)
 
     return data
-
-
-RUN_MODE = sys.argv[-1]

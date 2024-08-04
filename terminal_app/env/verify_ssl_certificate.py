@@ -1,9 +1,11 @@
+__all__ = ["CERTIFICATES_DIR", "verify_ssl_certificate"]
+
 import certifi
 import requests
 
-from .env import CONFIG_DIR
+from .env import CONFIG_BASE_DIR
 
-CERTIFICATES_DIR = CONFIG_DIR / "certificates"
+CERTIFICATES_DIR = CONFIG_BASE_DIR / "certificates"
 
 
 def verify_ssl_certificate(url: str):
