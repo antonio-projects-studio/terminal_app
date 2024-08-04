@@ -13,7 +13,7 @@ __all__ = [
 ]
 
 
-# import __main__
+import __main__
 import os
 import sys
 import platform
@@ -22,8 +22,12 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 OS = platform.system().lower()
-BASE_DIR = Path(os.getcwd()).parent
-WORK_DIR = Path(os.getcwd())
+BASE_DIR = Path(os.getcwd()).parent if "-m" not in sys.orig_argv else Path(os.getcwd())
+WORK_DIR = (
+    Path(os.getcwd())
+    if "-m" not in sys.orig_argv
+    else Path(os.path.dirname(__main__.__file__))
+)
 
 CONFIG_BASE_DIR = BASE_DIR / "configs"
 DATA_DIR = BASE_DIR / "data"
