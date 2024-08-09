@@ -1,2 +1,2 @@
 from .coroutine import *
-from .classproperty import *
+from .class_property import *
