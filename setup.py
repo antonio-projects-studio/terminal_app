@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setup(
     name="terminal_app",
-    version="0.2.0",
+    version="0.2.1",
     author="Antonio Rodrigues",
     author_email="antonio.projects.studio@gmail.com",
     description="Library for terminal application",
