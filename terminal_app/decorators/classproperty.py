@@ -1,7 +1,7 @@
-__all__ = ["class_property"]
+__all__ = ["classproperty"]
 
 
-class class_property:
+class classproperty:
     def __init__(self, func):
         self.fget = func
 
