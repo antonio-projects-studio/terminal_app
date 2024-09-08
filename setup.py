@@ -15,5 +15,5 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/antonio-projects-studio/terminal_app",
     packages=find_packages(),
-    install_requires=["python-dotenv", "requests", "certifi"],
+    install_requires=["python-dotenv", "requests", "certifi", "pytest_is_running"],
 )
