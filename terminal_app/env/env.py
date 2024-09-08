@@ -21,17 +21,19 @@ import platform
 from pathlib import Path
 from dotenv import load_dotenv
 
+
 OS = platform.system().lower()
+
 BASE_DIR = Path(os.getcwd()).parent if "-m" not in sys.orig_argv else Path(os.getcwd())
 WORK_DIR = (
     Path(os.getcwd())
     if "-m" not in sys.orig_argv
     else Path(os.path.dirname(__main__.__file__))
 )
-
 CONFIG_BASE_DIR = BASE_DIR / "configs"
 DATA_DIR = BASE_DIR / "data"
-DEV_DIR = CONFIG_BASE_DIR / f"development"
+tmp = os.getenv("CONFIG_PATH")
+DEV_DIR = CONFIG_BASE_DIR / (tmp if tmp is not None else "development")
 PROD_DIR = CONFIG_BASE_DIR / f"production"
 
 APP_MODE = os.getenv("PROD") or "development"

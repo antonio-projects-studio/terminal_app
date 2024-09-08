@@ -1,7 +1,7 @@
 __all__ = ["TFormatting", "Languages"]
 
 from enum import StrEnum
-from typing import Any
+from typing import Any, Sequence
 
 
 class Languages(StrEnum):
@@ -47,7 +47,7 @@ class TFormatting(StrEnum):
         return "\n\n".join([f"{name + ":"}\n{value}" for name, value in data.items()])
 
     @staticmethod
-    def list_formatting(data: list[Any], start: int = 1) -> str:
+    def list_formatting(data: Sequence[Any], start: int = 1) -> str:
         return "\n".join([f"{ind + start}. {x}" for ind, x in enumerate(data)])
 
     @staticmethod
