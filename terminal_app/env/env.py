@@ -20,11 +20,20 @@ import platform
 
 from pathlib import Path
 from dotenv import load_dotenv
+from pytest_is_running import is_running
 
 
 OS = platform.system().lower()
 
-BASE_DIR = Path(os.getcwd()).parent if "-m" not in sys.orig_argv else Path(os.getcwd())
+if is_running():
+    BASE_DIR = Path(os.getcwd()) / "tests"
+else:
+    BASE_DIR = (
+        Path(os.getcwd()).parent if "-m" not in sys.orig_argv else Path(os.getcwd())
+    )
+
+print(BASE_DIR)
+    
 WORK_DIR = (
     Path(os.getcwd())
     if "-m" not in sys.orig_argv
