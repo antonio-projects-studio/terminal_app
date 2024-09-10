@@ -5,8 +5,12 @@ import urllib.parse
 class Curlify:
     def __init__(self, request: requests.PreparedRequest | requests.Request | flask.Request, localhost=False, compressed=False, verify=True):
         self.request = request
+        self.url = self.request.url
+
         if localhost:
-            setattr(self.request, "url", "localhost")
+            parsed = urllib.parse.urlparse(self.request.url)
+            self.url = f"127.0.0.1:{parsed.port}"
+            
         self.compressed = compressed
         self.verify = verify
 
@@ -16,7 +20,12 @@ class Curlify:
         Returns:
             str: return string of set headers
         """
-        headers = [f'"{k}: {v}"' for k, v in self.request.headers.items()]
+        def validation(k, v):
+            if k == "Host":
+                v = self.url
+            return f'"{k}: {v}"'
+        
+        headers = [validation(k, v) for k, v in self.request.headers.items()]
 
         return " -H ".join(headers)
 
@@ -36,7 +45,7 @@ class Curlify:
         Returns:
             str: string represents curl command
         """
-        curl = f"curl -X {self.request.method}{f" -H {self.headers()}" if self.headers() else ""}{f" -d '{self.body()}'" if self.body() else ""} {self.request.url}"
+        curl = f"curl -X {self.request.method}{f" -H {self.headers()}" if self.headers() else ""}{f" -d '{self.body()}'" if self.body() else ""} {self.url}"
 
         if self.compressed:
             curl += " --compressed"
