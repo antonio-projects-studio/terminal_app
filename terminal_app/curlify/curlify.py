@@ -9,8 +9,8 @@ class Curlify:
 
         if localhost:
             parsed = urllib.parse.urlparse(self.request.url)
-            self.url = f"127.0.0.1:{parsed.port}"
-            
+            parsed._replace(netloc="127.0.0.1")
+            self.url =urllib.parse.urlunparse(parsed)
         self.compressed = compressed
         self.verify = verify
 
