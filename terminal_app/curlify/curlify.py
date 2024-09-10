@@ -1,8 +1,8 @@
-from requests import PreparedRequest
-
+import requests
+import flask
 
 class Curlify:
-    def __init__(self, request: PreparedRequest, compressed=False, verify=True):
+    def __init__(self, request: requests.PreparedRequest | requests.Request | flask.Request, compressed=False, verify=True):
         self.request = request
         self.compressed = compressed
         self.verify = verify
@@ -18,6 +18,9 @@ class Curlify:
         return " -H ".join(headers)
 
     def body(self) -> str | None:
+        if not isinstance(self.request, requests.PreparedRequest):
+            return str(self.request.data, "utf-8")
+        
         return (
             self.request.body
             if isinstance(self.request.body, str | None)
