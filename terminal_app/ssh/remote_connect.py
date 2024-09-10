@@ -29,6 +29,9 @@ class SSHClient(paramiko.SSHClient):
             self.config.update({"password": password})
 
         self.connect(**self.config)  # type: ignore
+        transport = self.get_transport()
+        if transport is not None:
+            transport.set_keepalive(60)
 
     def http_request(
         self, request: requests.Request | requests.PreparedRequest | flask.Request
