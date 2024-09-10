@@ -1,9 +1,12 @@
 import requests
 import flask
+import urllib.parse
 
 class Curlify:
-    def __init__(self, request: requests.PreparedRequest | requests.Request | flask.Request, compressed=False, verify=True):
+    def __init__(self, request: requests.PreparedRequest | requests.Request | flask.Request, localhost=False, compressed=False, verify=True):
         self.request = request
+        if localhost:
+            setattr(self.request, "url", "localhost")
         self.compressed = compressed
         self.verify = verify
 

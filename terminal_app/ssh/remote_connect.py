@@ -34,7 +34,7 @@ class SSHClient(paramiko.SSHClient):
         self, request: requests.Request | requests.PreparedRequest | flask.Request
     ) -> dict[str, Any]:
         ssh_stdin, ssh_stdout, ssh_stderr = self.exec_command(
-            Curlify(request).to_curl()
+            Curlify(request, localhost=True).to_curl()
         )
         ssh_stdin.close()
 
