@@ -1,5 +1,11 @@
-import paramiko
+from typing import Any
+
 import os
+import json
+import paramiko
+from requests import Request
+
+from terminal_app.curlify import Curlify
 
 
 class SSHClient(paramiko.SSHClient):
@@ -22,3 +28,16 @@ class SSHClient(paramiko.SSHClient):
             self.config.update({"password": password})
 
         self.connect(**self.config)  # type: ignore
+
+    def http_request(self, request: Request) -> dict[str, Any]:
+        ssh_stdin, ssh_stdout, ssh_stderr = self.exec_command(
+            Curlify(request.prepare()).to_curl()
+        )
+        ssh_stdin.close()
+        
+        res_line = ""
+        for line in ssh_stdout:
+            res_line += line
+
+
+        return json.loads(res_line)

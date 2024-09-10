@@ -30,7 +30,7 @@ class Curlify:
         Returns:
             str: string represents curl command
         """
-        curl = f"curl -X {self.request.method} -H {self.headers()}{f" -d '{self.body()}' " if self.body() else ""}{self.request.url}"
+        curl = f"curl -X {self.request.method}{f" -H {self.headers()}" if self.headers() else ""}{f" -d '{self.body()}'" if self.body() else ""} {self.request.url}"
 
         if self.compressed:
             curl += " --compressed"
