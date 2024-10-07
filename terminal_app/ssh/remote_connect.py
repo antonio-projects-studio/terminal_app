@@ -5,19 +5,22 @@ import json
 import paramiko
 import requests
 import flask
+from pathlib import Path
 
 from terminal_app.curlify import Curlify
 
 
 class SSHClient(paramiko.SSHClient):
-    def __init__(self, name: str, password: str | None = None) -> None:
+    def __init__(
+        self, name: str, password: str | None = None, path: Path = Path("~/.ssh")
+    ) -> None:
         self.config = paramiko.SSHConfig.from_path(
-            os.path.expanduser("~/.ssh/config")
+            os.path.expanduser(path / "config")
         ).lookup(name)
         super().__init__()
 
         self.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.load_host_keys(os.path.expanduser("~/.ssh/known_hosts"))
+        self.load_host_keys(os.path.expanduser(path / "known_hosts"))
 
         if self.config.get("identityfile"):
             self.config.update({"key_filename": self.config["identityfile"]})

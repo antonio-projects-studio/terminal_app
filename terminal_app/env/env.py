@@ -2,6 +2,7 @@ __all__ = [
     "OS",
     "BASE_DIR",
     "WORK_DIR",
+    "SSH_DIR",
     "CONFIG_BASE_DIR",
     "DATA_DIR",
     "DEV_DIR",
@@ -32,8 +33,8 @@ else:
         Path(os.getcwd()).parent if "-m" not in sys.orig_argv else Path(os.getcwd())
     )
 
-print(BASE_DIR)
-    
+print(f"{BASE_DIR=}")
+
 WORK_DIR = (
     Path(os.getcwd())
     if "-m" not in sys.orig_argv
@@ -41,6 +42,7 @@ WORK_DIR = (
 )
 CONFIG_BASE_DIR = BASE_DIR / "configs"
 DATA_DIR = BASE_DIR / "data"
+SSH_DIR = BASE_DIR / ".ssh"
 tmp = os.getenv("CONFIG_PATH")
 DEV_DIR = CONFIG_BASE_DIR / (tmp if tmp is not None else "development")
 PROD_DIR = CONFIG_BASE_DIR / f"production"
