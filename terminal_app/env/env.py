@@ -40,9 +40,9 @@ WORK_DIR = (
 )
 CONFIG_BASE_DIR = BASE_DIR / "configs"
 tmp = os.getenv("DATA_DIR")
-DATA_DIR = (BASE_DIR / "data") if not tmp else tmp
+DATA_DIR = (BASE_DIR / "data") if not tmp else Path(tmp)
 tmp = os.getenv("SSH_DIR")
-SSH_DIR = (BASE_DIR / ".ssh") if not tmp else tmp
+SSH_DIR = (BASE_DIR / ".ssh") if not tmp else Path(tmp)
 
 tmp = os.getenv("CONFIG_PATH")
 CONFIG_PATH = (CONFIG_BASE_DIR / tmp) if tmp else None
