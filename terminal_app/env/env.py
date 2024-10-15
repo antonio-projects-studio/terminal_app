@@ -33,29 +33,43 @@ else:
         Path(os.getcwd()).parent if "-m" not in sys.orig_argv else Path(os.getcwd())
     )
 
-print(f"{BASE_DIR=}")
-
 WORK_DIR = (
     Path(os.getcwd())
     if "-m" not in sys.orig_argv
     else Path(os.path.dirname(__main__.__file__))
 )
 CONFIG_BASE_DIR = BASE_DIR / "configs"
-DATA_DIR = BASE_DIR / "data"
-SSH_DIR = BASE_DIR / ".ssh"
-tmp = os.getenv("CONFIG_PATH")
-DEV_DIR = CONFIG_BASE_DIR / (tmp if tmp is not None else "development")
-PROD_DIR = CONFIG_BASE_DIR / f"production"
+tmp = os.getenv("DATA_DIR")
+DATA_DIR = BASE_DIR / "data" if not tmp else tmp
+tmp = os.getenv("SSH_DIR")
+SSH_DIR = BASE_DIR / ".ssh" if not tmp else tmp
+
+CONFIG_PATH = os.getenv("CONFIG_PATH")
+DEV_DIR = CONFIG_BASE_DIR / "development"
+PROD_DIR = CONFIG_BASE_DIR / "production"
 
 APP_MODE = os.getenv("PROD") or "development"
 RUN_MODE = sys.argv[-1]
 
-CONFIG_DIR = DEV_DIR if APP_MODE == "development" else PROD_DIR
+CONFIG_DIR = (
+    Path(CONFIG_PATH)
+    if CONFIG_PATH
+    else DEV_DIR if APP_MODE == "development" else PROD_DIR
+)
 
+if os.getenv("INIT_DEFAULT"):
+    for path in [CONFIG_BASE_DIR, DATA_DIR, DEV_DIR, PROD_DIR, SSH_DIR]:
+        if not path.exists():
+            os.mkdir(path)
 
-for path in [CONFIG_BASE_DIR, DATA_DIR, DEV_DIR, PROD_DIR]:
-    if not path.exists():
-        os.mkdir(path)
+print("Project config:")
+print(f"{OS=}")
+print(f"{BASE_DIR=}")
+print(f"{WORK_DIR=}")
+print(f"{CONFIG_DIR=}")
+print(f"{DATA_DIR=}")
+print(f"{SSH_DIR=}")
+print(f"{APP_MODE=}")
 
 
 def source(env_files: str | list[str]) -> dict[str, str]:
@@ -80,7 +94,7 @@ def source(env_files: str | list[str]) -> dict[str, str]:
                 if not line.startswith("#"):
                     name = line[: line.find("=")].strip().strip('"').strip("'")
                     arg = line[line.find("=") + 1 :].strip().strip('"').strip("'")
-                    data[name] = arg
+                    data[name] = os.getenv(name, "")
 
     if isinstance(env_files, str):
         _source(env_files)
