@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setup(
     name="terminal_app",
-    version="0.2.8",
+    version="0.2.9",
     author="Antonio Rodrigues",
     author_email="antonio.projects.studio@gmail.com",
     description="Library for terminal application",
@@ -15,5 +15,5 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/antonio-projects-studio/terminal_app",
     packages=find_packages(),
-    install_requires=["python-dotenv", "requests", "certifi", "pytest_is_running", "paramiko"],
+    install_requires=["python-dotenv", "requests", "certifi", "pytest_is_running", "paramiko", "magic-filter"],
 )
