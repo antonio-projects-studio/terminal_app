@@ -4,9 +4,6 @@ from pathlib import Path
 
 F = MagicFilter()
 
-fm = FileManager(Path(__file__).parent / "data", formats=["json"])
+fm = FileManager(Path(__file__).parent, formats="*", only_cnt=True)
 
-print(fm.paths)
-print(fm.cnt)
-
-fm.copy(Path(__file__).parent / "data_copy")
+print(fm.cnts)
