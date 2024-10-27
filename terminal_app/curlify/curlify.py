@@ -1,6 +1,12 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import json
 import requests
-import flask
+if TYPE_CHECKING:
+    import flask
+    
 import urllib.parse
 
 

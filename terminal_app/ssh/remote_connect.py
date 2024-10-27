@@ -1,10 +1,14 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import Any, TYPE_CHECKING
 
 import os
 import json
 import paramiko
 import requests
-import flask
+if TYPE_CHECKING:
+    import flask
+    
 from pathlib import Path
 
 from terminal_app.curlify import Curlify

@@ -3,6 +3,7 @@ __all__ = [
     "BASE_DIR",
     "WORK_DIR",
     "SSH_DIR",
+    "MEDIA_DIR",
     "CONFIG_BASE_DIR",
     "DATA_DIR",
     "DEV_DIR",
@@ -43,6 +44,8 @@ tmp = os.getenv("DATA_DIR")
 DATA_DIR = (BASE_DIR / "data") if not tmp else Path(tmp)
 tmp = os.getenv("SSH_DIR")
 SSH_DIR = (BASE_DIR / ".ssh") if not tmp else Path(tmp)
+tmp = os.getenv("MEDIA_DIR")
+MEDIA_DIR = (BASE_DIR / "media") if not tmp else Path(tmp)
 
 tmp = os.getenv("CONFIG_PATH")
 CONFIG_PATH = (CONFIG_BASE_DIR / tmp) if tmp else None
@@ -59,7 +62,7 @@ CONFIG_DIR = (
 )
 
 if os.getenv("INIT_DEFAULT"):
-    for path in [CONFIG_BASE_DIR, DATA_DIR, DEV_DIR, PROD_DIR, SSH_DIR]:
+    for path in [CONFIG_BASE_DIR, DATA_DIR, DEV_DIR, PROD_DIR, SSH_DIR, MEDIA_DIR]:
         if not path.exists():
             os.mkdir(path)
 
