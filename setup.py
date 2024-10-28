@@ -15,5 +15,5 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/antonio-projects-studio/terminal_app",
     packages=find_packages(),
-    install_requires=["python-dotenv", "requests", "certifi", "pytest_is_running", "paramiko", "magic-filter"],
+    install_requires=["python-dotenv==1.0.1", "requests==2.32.3", "certifi==2024.8.30", "pytest_is_running==1.5.1", "paramiko==3.5.0", "magic-filter==1.0.12"],
 )
