@@ -1,6 +1,8 @@
-__all__ = ["get_params", "safety_call"]
+__all__ = ["get_params", "safety_call", "safety_call_decorator"]
 
 import asyncio
+import inspect
+from functools import wraps
 from typing import Callable, Any, Awaitable, TypeVar, overload, Coroutine
 
 T = TypeVar("T")
@@ -9,9 +11,18 @@ T = TypeVar("T")
 def get_params(fn: Callable, **params) -> tuple[tuple[Any, ...], dict[str, Any]]:
     args: list[Any] = []
     kwargs: dict[str, Any] = {}
-    args_names = fn.__code__.co_varnames
-    positional_only = args_names[: fn.__code__.co_posonlyargcount]
-    other = args_names[fn.__code__.co_posonlyargcount :]
+    signature = inspect.signature(fn)
+    positional_only = [
+        param.name
+        for param in signature.parameters.values()
+        if param.kind == param.POSITIONAL_ONLY
+    ]
+
+    other = [
+        param.name
+        for param in signature.parameters.values()
+        if param.name not in positional_only
+    ]
 
     args_names = tuple(params.keys())
 
@@ -27,16 +38,16 @@ def get_params(fn: Callable, **params) -> tuple[tuple[Any, ...], dict[str, Any]]
 
 
 @overload
-async def safety_call(fn: Callable[..., Awaitable[T]], **params) -> T:
+async def safety_call(fn: Callable[..., Awaitable[T]], /, **params) -> T:
     pass
 
 
 @overload
-def safety_call(fn: Callable[..., T], **params) -> T:
+def safety_call(fn: Callable[..., T], /, **params) -> T:
     pass
 
 
-def safety_call(fn: Callable[..., T], **params) -> T | Coroutine[Any, Any, T]:
+def safety_call(fn: Callable[..., T], /, **params) -> T | Coroutine[Any, Any, T]:
     args, kwargs = get_params(fn, **params)
 
     if asyncio.iscoroutinefunction(fn):
@@ -47,11 +58,26 @@ def safety_call(fn: Callable[..., T], **params) -> T | Coroutine[Any, Any, T]:
 
 if __name__ == "__main__":
 
-    async def func(a, b, c=3) -> None:
+    async def func(a, b, /, c=3) -> None:
         await asyncio.sleep(2)
         print(a, b, c)
+
+    class A:
+        @staticmethod
+        def f(a, b, /, c):
+            print(a)
 
     async def main() -> None:
         await safety_call(func, a=1, b=2)
 
     asyncio.run(main())
+
+
+def safety_call_decorator(function: Callable[..., Awaitable[T]] | Callable[..., T]):
+
+    @wraps(function)
+    def wrapper(**kwargs):
+        return safety_call(function, **kwargs)
+
+    wrapper.__signature__ = inspect.signature(function)  # type: ignore
+    return wrapper
