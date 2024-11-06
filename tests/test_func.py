@@ -1,5 +1,5 @@
 import asyncio
-from terminal_app.decorators import safety_call
+from terminal_app.decorator import safety_call
 
 
 @safety_call

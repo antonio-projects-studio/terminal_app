@@ -16,4 +16,4 @@ def random_day(day1: date, day2: date) -> date:
 def random_string() -> str:
     # choose from all lowercase letter
     letters = string.ascii_lowercase
-    return "".join(random.choice(letters) for i in range(random.randrange(1, 10)))
+    return "".join(random.choice(letters) for _ in range(random.randrange(1, 10)))
