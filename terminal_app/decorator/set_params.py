@@ -1,11 +1,11 @@
 __all__ = ["set_params"]
 
 import inspect
-from typing import Any, Callable
 from functools import wraps
+from typing import Any, Callable
 
 
-def set_params(function: Callable, args: list[tuple[Any, int]], **kwargs):
+def set_params(func: Callable, args: list[tuple[Any, int]], **kwargs):
     @wraps
     def wrapper(*a, **kw):
         arguments = list(a)
@@ -16,7 +16,7 @@ def set_params(function: Callable, args: list[tuple[Any, int]], **kwargs):
 
         kw.update(kwargs)
 
-        return function(*arguments, **kw)
+        return func(*arguments, **kw)
 
-    setattr(wrapper, "__signature__", inspect.signature(function))
+    setattr(wrapper, "__signature__", inspect.signature(func))
     return wrapper
