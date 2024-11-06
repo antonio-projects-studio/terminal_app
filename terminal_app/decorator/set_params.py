@@ -5,18 +5,26 @@ from functools import wraps
 from typing import Any, Callable
 
 
-def set_params(func: Callable[..., Any], args: list[tuple[Any, int]], **kwargs):
-    @wraps
-    def wrapper(*a, **kw):
-        arguments = list(a)
+def set_params(
+    args: tuple[tuple[Any, int], ...] = (), kwargs: dict[str, Any] | None = None
+):
 
-        for arg in args:
-            value, ind = arg
-            arguments.insert(ind, value)
+    def decorator(func: Callable[..., Any]):
 
-        kw.update(kwargs)
+        @wraps(func)
+        def wrapper(*a, **kw):
+            arguments = list(a)
 
-        return func(*arguments, **kw)
+            for arg in args:
+                value, ind = arg
+                arguments.insert(ind, value)
 
-    setattr(wrapper, "__signature__", inspect.signature(func))
-    return wrapper
+            if kwargs is not None:
+                kw.update(kwargs)
+
+            return func(*arguments, **kw)
+
+        setattr(wrapper, "__signature__", inspect.signature(func))
+        return wrapper
+
+    return decorator
