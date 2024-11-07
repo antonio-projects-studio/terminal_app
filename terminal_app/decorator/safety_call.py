@@ -3,13 +3,14 @@ __all__ = ["get_params", "safety_call"]
 import asyncio
 import inspect
 from functools import wraps
+from collections.abc import Mapping
 from typing import Callable, Any, Awaitable, TypeVar, overload, Coroutine
 
 T = TypeVar("T")
 
 
 def get_params(
-    fn: Callable, /, params: dict[str, Any]
+    fn: Callable, /, params: Mapping[str, Any]
 ) -> tuple[tuple[Any, ...], dict[str, Any]]:
     args: list[Any] = []
     kwargs: dict[str, Any] = {}
@@ -50,17 +51,19 @@ def safety_call(fn: Callable[..., T], /) -> Callable[..., T]:
 
 
 @overload
-async def safety_call(fn: Callable[..., Awaitable[T]], /, params: dict[str, Any]) -> T:
+async def safety_call(
+    fn: Callable[..., Awaitable[T]], /, params: Mapping[str, Any]
+) -> T:
     pass
 
 
 @overload
-def safety_call(fn: Callable[..., T], /, params: dict[str, Any]) -> T:
+def safety_call(fn: Callable[..., T], /, params: Mapping[str, Any]) -> T:
     pass
 
 
 def safety_call(
-    fn: Callable[..., T], /, params: dict[str, Any] | None = None
+    fn: Callable[..., T], /, params: Mapping[str, Any] | None = None
 ) -> T | Coroutine | Callable[..., T]:
     if params is None:
 
