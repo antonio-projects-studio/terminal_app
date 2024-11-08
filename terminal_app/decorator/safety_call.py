@@ -41,7 +41,9 @@ def get_params(
 
 
 @overload
-def safety_call(fn: Callable[..., Awaitable[T]], /) -> Callable[..., Awaitable[T]]:
+def safety_call(
+    fn: Callable[..., Awaitable[T]], /
+) -> Callable[..., Coroutine[Any, Any, T]]:
     pass
 
 
