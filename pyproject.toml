@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "terminal_app"
+description = 'Library for terminal application'
+readme = "README.md"
+authors = [
+	{ name = "Antonio Rodrigues", email = "antonio.projects.studio@gmail.com" },
+]
+keywords = ["terminal_app", "mipt"]
+dependencies = [
+	"python-dotenv~=1.0.1",
+	"requests~=2.32.3",
+	"certifi~=2024.8.30",
+	"pytest_is_running~=1.5.1",
+	"paramiko~=3.5.0",
+	"magic-filter~=1.0.12",
+]
+dynamic = ["version"]
+
+[project.urls]
+GitHub = "https://github.com/antonio-projects-studio/terminal_app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.setuptools.package-data]
+"*" = ['*.json']
+
+[tool.setuptools.dynamic]
+version = { attr = "terminal_app.__version__" }
+
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+filterwarnings = ["error", "ignore::pytest.PytestUnraisableExceptionWarning"]

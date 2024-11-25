@@ -3,9 +3,9 @@ __all__ = ["CERTIFICATES_DIR", "verify_ssl_certificate"]
 import certifi
 import requests
 
-from .env import CONFIG_BASE_DIR
+from .env import PROJECT_CONFIG
 
-CERTIFICATES_DIR = CONFIG_BASE_DIR / "certificates"
+CERTIFICATES_DIR = PROJECT_CONFIG.CERTIFICATES_DIR
 
 
 def verify_ssl_certificate(url: str):

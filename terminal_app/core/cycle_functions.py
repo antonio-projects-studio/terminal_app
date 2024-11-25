@@ -29,13 +29,13 @@ def app_input(message: str) -> str:
         prompt = QuitOrReturnOptions.RETURN.command
         QuitOrReturnOptions.RETURN.execute(prompt)
         return ""
-    
+
     QuitOrReturnOptions.QUIT.execute(prompt)
     return prompt
 
 
 def question_input(message: str) -> bool | str:
-    prompt = app_input(message)
+    prompt = app_input(f"{message} [y/n]")
     if not prompt:
         return ""
 
