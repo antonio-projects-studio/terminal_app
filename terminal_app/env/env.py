@@ -6,6 +6,7 @@ __all__ = [
     "MEDIA_DIR",
     "DATA_DIR",
     "RUN_MODE",
+    "PROJECT_CONFIG",
     "source",
 ]
 
@@ -22,7 +23,7 @@ from typing import Any, Self, Literal
 
 from tabulate import tabulate
 from pytest_is_running import is_running
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, Field
 
 
 parser = ArgumentParser()
@@ -86,6 +87,7 @@ class ProjectConfig(BaseModel):
     PHOTO_DIR: Path = MEDIA_DIR / "photo"
 
     INIT_FOLDERS: bool = False
+    DESCRIPTION: str = Field(init=False, exclude=True)
 
     @property
     def OS(self) -> str:
@@ -102,22 +104,19 @@ class ProjectConfig(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def init_project(cls, data: dict[str, Any]) -> dict[str, Any]:
-        print("# Terminal App")
-        print(f"- OS: {OS}")
-        print(f"- CONFIG: {args.config}")
-        print(f"- RUN_MODE: {RUN_MODE}")
-
         if not CONFIG_FILE.exists():
             with open(CONFIG_FILE, "w") as f:
                 f.write(f"# {CONFIG_FILE.name}\n")
 
             print(f"Create {CONFIG_FILE}")
+
         ProjectConfig.check_env_file(CONFIG_FILE)
 
-        print(_show_env_info(CONFIG_FILE))
+        desc = f"# Terminal App\n- OS: {OS}\n- CONFIG: {args.config}\n- RUN_MODE: {RUN_MODE}\n{_show_env_info(CONFIG_FILE)}"
 
         data = source(CONFIG_FILE)
         data["INIT_FOLDERS"] = data["INIT_FOLDERS"].lower()
+        data["DESCRIPTION"] = desc
 
         return data
 
@@ -126,7 +125,7 @@ class ProjectConfig(BaseModel):
         keys = _parse_env_file(env_file_path).keys()
         with open(env_file_path, "a") as f:
             for field, info in cls.model_fields.items():
-                if field not in keys:
+                if field not in keys and not info.exclude:
                     f.write(f"{field}={info.default}\n")
 
     @model_validator(mode="after")
@@ -137,12 +136,17 @@ class ProjectConfig(BaseModel):
                     if not path.exists():
                         os.mkdir(path)
 
+        another = ""
         for env_file in self.CONFIG_DIR.iterdir():
-            print(f"# {env_file.stem.replace("_", " ").strip(".").title()}")
+            another += f"\n# {env_file.stem.replace("_", " ").strip(".").title()}\n"
+            another += _show_env_info(env_file)
 
-            print(_show_env_info(env_file))
+        self.DESCRIPTION += another
 
         return self
+
+    def __repr__(self) -> str:
+        return self.DESCRIPTION
 
 
 def _parse_env_file(env_file_path: Path) -> dict[str, Any]:
@@ -218,6 +222,7 @@ def source(env_files: str | list[str] | Path | list[Path]) -> dict[str, str]:
 
 
 PROJECT_CONFIG = ProjectConfig()
+print(PROJECT_CONFIG)
 DATA_DIR = PROJECT_CONFIG.DATA_DIR
 SSH_DIR = PROJECT_CONFIG.SSH_DIR
 MEDIA_DIR = PROJECT_CONFIG.MEDIA_DIR
