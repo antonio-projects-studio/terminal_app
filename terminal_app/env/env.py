@@ -145,6 +145,9 @@ class ProjectConfig(BaseModel):
 
         return self
 
+    def __str__(self) -> str:
+        return self.DESCRIPTION
+
     def __repr__(self) -> str:
         return self.DESCRIPTION
 
