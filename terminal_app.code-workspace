@@ -2,12 +2,6 @@
 	"folders": [
 		{
 			"path": "."
-		},
-		{
-			"path": "../datalchemy"
-		},
-		{
-			"path": "../"
 		}
 	],
 	"settings": {}
