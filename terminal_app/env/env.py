@@ -1,7 +1,7 @@
 __all__ = [
     "OS",
-    "BASE_DIR",
-    "WORK_DIR",
+    "_BASE_DIR",
+    "_WORK_DIR",
     "SSH_DIR",
     "MEDIA_DIR",
     "DATA_DIR",
@@ -14,21 +14,17 @@ __all__ = [
 import __main__
 import os
 import sys
+import json
 import platform
 
 from pathlib import Path
 from dotenv import load_dotenv
-from argparse import ArgumentParser
 from typing import Any, Self, Literal
 
 from tabulate import tabulate
 from pytest_is_running import is_running
 from pydantic import BaseModel, model_validator, Field
 
-
-parser = ArgumentParser()
-parser.add_argument("-cf", "--config", type=str, default="development")
-args, _ = parser.parse_known_args()
 
 OS = platform.system().lower()
 RUN_MODE: Literal["script", "module", "jupyter", "bin"]
@@ -48,39 +44,38 @@ except:
 
 match RUN_MODE:
     case "script":
-        BASE_DIR = WORK_DIR = Path(os.path.dirname(__main__.__file__))
+        _BASE_DIR = _WORK_DIR = Path(os.path.dirname(__main__.__file__))
     case "module":
-        WORK_DIR = Path(os.path.dirname(__main__.__file__))
-        BASE_DIR = WORK_DIR.parent
+        _WORK_DIR = Path(os.path.dirname(__main__.__file__))
+        _BASE_DIR = _WORK_DIR.parent
     case "bin":
-        WORK_DIR = Path(os.getcwd())
-        BASE_DIR = WORK_DIR.parent
+        _WORK_DIR = Path(os.getcwd())
+        _BASE_DIR = _WORK_DIR.parent
 
         if is_running():
-            BASE_DIR = Path(os.getcwd()) / "tests"
+            _BASE_DIR = Path(os.getcwd()) / "tests"
     case "jupyter":
-        BASE_DIR = WORK_DIR = Path(os.getcwd())
+        _BASE_DIR = _WORK_DIR = Path(os.getcwd())
 
 if (tmp := os.getenv("BASE_DIR")) is not None:
-    BASE_DIR = Path(tmp)
+    _BASE_DIR = Path(tmp)
 
 if (tmp := os.getenv("WORK_DIR")) is not None:
-    WORK_DIR = Path(tmp)
+    _WORK_DIR = Path(tmp)
 
 CONFIG_NAME = ".terminal_app.env"
-CONFIG_FILE = BASE_DIR / CONFIG_NAME
+CONFIG_FILE = _BASE_DIR / CONFIG_NAME
 
 
 class ProjectConfig(BaseModel):
-    BASE_DIR: Path = BASE_DIR
-    WORK_DIR: Path = WORK_DIR
-    CONFIGS_DIR: Path = BASE_DIR / "configs"
-    DEV_DIR: Path = CONFIGS_DIR / "development"
-    PROD_DIR: Path = CONFIGS_DIR / "production"
-    TEST_DIR: Path = CONFIGS_DIR / "test"
-    CERTIFICATES_DIR: Path = BASE_DIR / "certificates"
+    BASE_DIR: Path = Field(default=_BASE_DIR, init=False, exclude=True)
+    WORK_DIR: Path = Field(default=_WORK_DIR, init=False, exclude=True)
+    CONFIGS_DIR: Path = _BASE_DIR / "configs"
+    CONFIG_FOLDERS: list = ["development", "production", "test"]
+    SOURCE_FOLDER: str = "development"
+    CERTIFICATES_DIR: Path = _BASE_DIR / "certificates"
     SSH_DIR: Path = CERTIFICATES_DIR / "ssh"
-    DATA_DIR: Path = BASE_DIR / "data"
+    DATA_DIR: Path = _BASE_DIR / "data"
     MEDIA_DIR: Path = DATA_DIR / "media"
     DOCUMENT_DIR: Path = MEDIA_DIR / "document"
     VIDEO_DIR: Path = MEDIA_DIR / "video"
@@ -99,7 +94,7 @@ class ProjectConfig(BaseModel):
 
     @property
     def CONFIG_DIR(self) -> Path:
-        return self.CONFIGS_DIR / args.config
+        return self.CONFIGS_DIR / self.SOURCE_FOLDER
 
     @model_validator(mode="before")
     @classmethod
@@ -112,11 +107,15 @@ class ProjectConfig(BaseModel):
 
         ProjectConfig.check_env_file(CONFIG_FILE)
 
-        desc = f"# Terminal App\n- OS: {OS}\n- CONFIG: {args.config}\n- RUN_MODE: {RUN_MODE}\n{_show_env_info(CONFIG_FILE)}"
+        desc = f"# Terminal App\n- OS: {OS}\n- CONFIG: {{}}\n- BASE_DIR: {{}}\n- WORK_DIR: {{}}\n- RUN_MODE: {RUN_MODE}\n{_show_env_info(CONFIG_FILE)}"
 
         data = source(CONFIG_FILE)
         data["INIT_FOLDERS"] = data["INIT_FOLDERS"].lower()
         data["DESCRIPTION"] = desc
+
+        assert (
+            data["SOURCE_FOLDER"] in data["CONFIG_FOLDERS"]
+        ), "SOURCE_FOLDER should be located in the CONFIG_FOLDERS"
 
         return data
 
@@ -126,15 +125,27 @@ class ProjectConfig(BaseModel):
         with open(env_file_path, "a") as f:
             for field, info in cls.model_fields.items():
                 if field not in keys and not info.exclude:
-                    f.write(f"{field}={info.default}\n")
+                    f.write(
+                        f"{field}={info.default if os.getenv(field, None) is None else os.getenv(field)}\n"
+                    )
 
     @model_validator(mode="after")
     def check_init_folders(self) -> Self:
         if self.INIT_FOLDERS:
-            for _, path in self:
+            for name, path in self:
                 if isinstance(path, Path):
                     if not path.exists():
                         os.mkdir(path)
+
+                    if name == "CONFIGS_PATH":
+                        for sub_path in self.CONFIG_FOLDERS:
+                            new_path = path / sub_path
+                            if not new_path.exists():
+                                os.mkdir(new_path)
+
+        self.DESCRIPTION = self.DESCRIPTION.format(
+            self.CONFIG_DIR, self.BASE_DIR, self.WORK_DIR
+        )
 
         another = ""
         for env_file in self.CONFIG_DIR.iterdir():
@@ -202,7 +213,14 @@ def source(env_files: str | list[str] | Path | list[Path]) -> dict[str, str]:
     def load_variables(env_file_path: Path) -> None:
         keys = _parse_env_file(env_file_path).keys()
         for key in keys:
-            data[key] = os.getenv(key, "")
+            variable = os.getenv(key, "")
+            if variable.startswith("["):
+                try:
+                    variable = json.loads(variable.replace("'", '"'))
+                except:
+                    pass
+
+            data[key] = variable
 
     if isinstance(env_files, str | Path):
         if isinstance(env_files, Path):
