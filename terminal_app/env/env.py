@@ -137,7 +137,7 @@ class ProjectConfig(BaseModel):
                     if not path.exists():
                         os.mkdir(path)
 
-                    if name == "CONFIGS_PATH":
+                    if name == "CONFIGS_DIR":
                         for sub_path in self.CONFIG_FOLDERS:
                             new_path = path / sub_path
                             if not new_path.exists():
