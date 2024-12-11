@@ -2,18 +2,20 @@ __all__ = ["generate_path"]
 
 import os
 from pathlib import Path
-from enum import Enum, auto
+from typing import Literal
 
-class ObjectType(Enum):
-    File = auto()
-    Dir = auto()
 
-def generate_path(name: Path, x: int=0, object_type: ObjectType = ObjectType.File) -> Path:
-    new_path = Path(name.parent / ((name.stem + ("_" + str(x) if x != 0 else "")).strip() + name.suffix))
+def generate_path(
+    name: Path, x: int = 0, object_type: Literal["file", "dir"] = "file"
+) -> Path:
+    new_path = Path(
+        name.parent
+        / ((name.stem + ("_" + str(x) if x != 0 else "")).strip() + name.suffix)
+    )
     if not new_path.exists():
-        if object_type == ObjectType.Dir:         
+        if object_type == "dir":
             os.mkdir(new_path)
-        else:        
+        else:
             with open(new_path, "w"):
                 pass
         return new_path
