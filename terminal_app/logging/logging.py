@@ -61,6 +61,7 @@ def register_logger(
     library: bool = False,
     level: logging._Level = logging.DEBUG,
     terminal_app_handler: bool = False,
+    without_handlers: bool = False,
 ) -> Logger:
     pass
 
@@ -71,6 +72,7 @@ def register_logger(
     name: str,
     library: bool = False,
     level: logging._Level = logging.DEBUG,
+    without_handlers: bool = False,
 ) -> Logger:
     pass
 
@@ -81,6 +83,7 @@ def register_logger(
     library: bool = False,
     level: logging._Level = logging.DEBUG,
     terminal_app_handler: bool = False,
+    without_handlers: bool = False,
 ) -> Logger:
 
     formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
@@ -106,42 +109,44 @@ def register_logger(
         else:
             logger = logging.getLogger(suffix)
 
-    if path is not None:
-        if not terminal_app_handler:
-            file_handler = logging.FileHandler(
-                file_path.as_posix(), mode=PROJECT_CONFIG.LOGGING_FILE_MODE
-            )
+    if not without_handlers:
+
+        if path is not None:
+            if not terminal_app_handler:
+                file_handler = logging.FileHandler(
+                    file_path.as_posix(), mode=PROJECT_CONFIG.LOGGING_FILE_MODE
+                )
+            else:
+                file_handler = TerminalAppHandler(
+                    file_path.as_posix(), mode=PROJECT_CONFIG.LOGGING_FILE_MODE
+                )
+
+            file_handler.setLevel(logging.DEBUG)
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
+
+            with open(file_path, f"{PROJECT_CONFIG.LOGGING_FILE_MODE}+") as f:
+                f.seek(0)
+                lines = f.readlines()
+                lines.reverse()
+
+                count = 1
+                message = "STARTUP {}\n"
+                for line in lines:
+                    if line.startswith("STARTUP"):
+                        try:
+                            count = int(line[-2]) + 1
+                            break
+                        except Exception as ex:
+                            print(ex)
+                            continue
+
+                f.write(message.format(count))
+
         else:
-            file_handler = TerminalAppHandler(
-                file_path.as_posix(), mode=PROJECT_CONFIG.LOGGING_FILE_MODE
-            )
-
-        file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-
-        with open(file_path, f"{PROJECT_CONFIG.LOGGING_FILE_MODE}+") as f:
-            f.seek(0)
-            lines = f.readlines()
-            lines.reverse()
-
-            count = 1
-            message = "STARTUP {}\n"
-            for line in lines:
-                if line.startswith("STARTUP"):
-                    try:
-                        count = int(line[-2]) + 1
-                        break
-                    except Exception as ex:
-                        print(ex)
-                        continue
-
-            f.write(message.format(count))
-
-    else:
-        stream_handler = logging.StreamHandler()
-        stream_handler.setFormatter(formatter)
-        logger.addHandler(stream_handler)
+            stream_handler = logging.StreamHandler()
+            stream_handler.setFormatter(formatter)
+            logger.addHandler(stream_handler)
 
     logger.setLevel(level)
 
