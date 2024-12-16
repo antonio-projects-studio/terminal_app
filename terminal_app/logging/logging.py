@@ -107,7 +107,7 @@ def register_logger(
             logger = logging.getLogger(suffix)
 
     if path is not None:
-        if terminal_app_handler:
+        if not terminal_app_handler:
             file_handler = logging.FileHandler(
                 file_path.as_posix(), mode=PROJECT_CONFIG.LOGGING_FILE_MODE
             )
