@@ -73,6 +73,9 @@ class ProjectConfig(BaseModel):
     CONFIGS_DIR: Path = _BASE_DIR / "configs"
     CONFIG_FOLDERS: list = ["development", "production", "test"]
     SOURCE_FOLDER: str = "development"
+    LOGGING_DIR: Path = _BASE_DIR / "logging"
+    LOGGING_SUFFIX: str = "terminal_app"
+    LOGGING_FILE_MODE: Literal["w", "a"] = "w"
     CERTIFICATES_DIR: Path = _BASE_DIR / "certificates"
     SSH_DIR: Path = CERTIFICATES_DIR / "ssh"
     DATA_DIR: Path = _BASE_DIR / "data"

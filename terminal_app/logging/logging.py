@@ -1,16 +1,78 @@
 from __future__ import annotations
 
-__all__ = ["register_logger", "LoggingMeta", "RootLogging"]
+__all__ = ["register_logger", "LoggingMeta", "RootLogging", "TerminalAppHandler"]
 
-import __main__
 import os
+import sys
 import logging
-from typing import Any
-from logging import Logger
+from typing import Any, overload
+from logging import Logger, FileHandler
 from pathlib import Path
 from inspect import getfile
 
-suffix = "terminal_app.Engine"
+from terminal_app.env import PROJECT_CONFIG
+
+suffix = PROJECT_CONFIG.LOGGING_SUFFIX
+
+
+class TerminalAppHandler(FileHandler):
+
+    def emit(self, record: logging.LogRecord) -> None:
+        stream = self.stream
+        line = self.get_line(self.baseFilename)
+        mesage = record.msg
+
+        record.msg = line
+        self.stream = sys.stdout  # type: ignore
+        super().emit(record)
+
+        self.stream = stream
+        record.msg = mesage
+        super().emit(record)
+        return None
+
+    def close(self) -> None:
+
+        return super().close()
+
+    @staticmethod
+    def get_line(logger: Logger | str | Path) -> str:
+        if isinstance(logger, Logger):
+            for handler in logger.handlers:
+                if isinstance(handler, FileHandler):
+                    logging_path = handler.baseFilename
+        else:
+            logging_path = logger
+
+        try:
+            with open(logging_path, "r") as f:
+                return f"{logging_path}, line {len(f.readlines()) + 1}"
+
+        except:
+
+            return ""
+
+
+@overload
+def register_logger(
+    path: Path | str,
+    *,
+    name: str | None = None,
+    library: bool = False,
+    level: logging._Level = logging.DEBUG,
+    terminal_app_handler: bool = False,
+) -> Logger:
+    pass
+
+
+@overload
+def register_logger(
+    *,
+    name: str,
+    library: bool = False,
+    level: logging._Level = logging.DEBUG,
+) -> Logger:
+    pass
 
 
 def register_logger(
@@ -18,6 +80,7 @@ def register_logger(
     name: str | None = None,
     library: bool = False,
     level: logging._Level = logging.DEBUG,
+    terminal_app_handler: bool = False,
 ) -> Logger:
 
     formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
@@ -35,18 +98,46 @@ def register_logger(
             logger.removeHandler(handler)
     else:
         if name is not None:
+            naming = f"{suffix}.{name}"
             assert (
-                f"{name}.{suffix}" not in logging.Logger.manager.loggerDict.keys()
+                naming not in logging.Logger.manager.loggerDict.keys()
             ), "The same name of the loggers"
-            logger = logging.getLogger(f"{name}.{suffix}")
+            logger = logging.getLogger(naming)
         else:
             logger = logging.getLogger(suffix)
 
     if path is not None:
-        file_handler = logging.FileHandler(file_path.as_posix(), mode="w")
+        if terminal_app_handler:
+            file_handler = logging.FileHandler(
+                file_path.as_posix(), mode=PROJECT_CONFIG.LOGGING_FILE_MODE
+            )
+        else:
+            file_handler = TerminalAppHandler(
+                file_path.as_posix(), mode=PROJECT_CONFIG.LOGGING_FILE_MODE
+            )
+
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
+
+        with open(file_path, f"{PROJECT_CONFIG.LOGGING_FILE_MODE}+") as f:
+            f.seek(0)
+            lines = f.readlines()
+            lines.reverse()
+
+            count = 1
+            message = "STARTUP {}\n"
+            for line in lines:
+                if line.startswith("STARTUP"):
+                    try:
+                        count = int(line[-2]) + 1
+                        break
+                    except Exception as ex:
+                        print(ex)
+                        continue
+
+            f.write(message.format(count))
+
     else:
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(formatter)
@@ -58,8 +149,7 @@ def register_logger(
 
 
 class LoggingMeta(type):
-    __folder_name__: str = "logging"
-    __root_path__: Path = Path(__main__.__file__).parent.parent / __folder_name__
+    __root_path__: Path = PROJECT_CONFIG.LOGGING_DIR
     logger: Logger
     root_logger: Logger
 
