@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-__all__ = ["register_logger", "LoggingMeta", "RootLogging", "TerminalAppHandler"]
+__all__ = ["register_logger", "LoggingMeta", "RootLogging", "TerminalAppHandler", "DEFAULT_FORMATTER", "DEFAULT_STREAM"]
 
 import os
 import sys
