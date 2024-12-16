@@ -14,6 +14,10 @@ from terminal_app.env import PROJECT_CONFIG
 
 suffix = PROJECT_CONFIG.LOGGING_SUFFIX
 
+DEFAULT_FORMATTER = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
+DEFAULT_STREAM = logging.StreamHandler()
+DEFAULT_STREAM.setFormatter(DEFAULT_FORMATTER)
+
 
 class TerminalAppHandler(FileHandler):
 
@@ -144,9 +148,7 @@ def register_logger(
                 f.write(message.format(count))
 
         else:
-            stream_handler = logging.StreamHandler()
-            stream_handler.setFormatter(formatter)
-            logger.addHandler(stream_handler)
+            logger.addHandler(DEFAULT_STREAM)
 
     logger.setLevel(level)
 
