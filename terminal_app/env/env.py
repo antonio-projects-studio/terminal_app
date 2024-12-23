@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 __all__ = [
     "OS",
     "_BASE_DIR",
@@ -17,9 +19,14 @@ import sys
 import json
 import platform
 
+from typing import Literal, Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Self
+
 from pathlib import Path
 from dotenv import load_dotenv
-from typing import Any, Self, Literal
+
 
 from tabulate import tabulate
 from pytest_is_running import is_running
