@@ -6,7 +6,10 @@ from typing import Literal
 
 
 def generate_path(
-    name: Path, x: int = 0, object_type: Literal["file", "dir"] = "file", create: bool = True
+    name: Path,
+    x: int = 0,
+    object_type: Literal["file", "dir"] = "file",
+    create: bool = True,
 ) -> Path:
     new_path = Path(
         name.parent
@@ -23,4 +26,4 @@ def generate_path(
 
         return new_path
     else:
-        return generate_path(name, x + 1, object_type)
+        return generate_path(name, x + 1, object_type, create)
